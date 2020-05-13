@@ -42,4 +42,13 @@ public class InvoiceGeneratorTest {
         double fare= invoiceGenerator.calculateCabFare(cabRides);
         Assert.assertEquals(230,fare,0.0);
     }
+
+    //TC-2.2
+    @Test
+    public void givenMultipleRides_whenInvoiceGenerator_shouldReturnInCorrectTotalFare() {
+        Ride[]cabRides={new Ride(20.0,25),
+                new Ride(0.4,1)};
+        double fare= invoiceGenerator.calculateCabFare(cabRides);
+        Assert.assertNotEquals(30,fare,0.0);
+    }
 }
