@@ -22,4 +22,13 @@ public class InvoiceGeneratorTest {
         double fare = invoiceGenerator.calculateCabFare(distance,time);
         Assert.assertEquals(225,fare,0.0);
     }
+
+    //TC-1.2
+    @Test
+    public void givenDistanceAndTime_whenInvoiceGenerator_shouldReturnIncorrectTotalFare() {
+        double distance=20.0;
+        int time=25;
+        double fare = invoiceGenerator.calculateCabFare(distance,time);
+        Assert.assertNotEquals(25,fare,0.0);
+    }
 }
