@@ -1,6 +1,7 @@
 package com.invoicegenerator.test;
 
 import com.invoicegenerator.InvoiceGenerator;
+import com.invoicegenerator.Ride;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,5 +31,15 @@ public class InvoiceGeneratorTest {
         int time=25;
         double fare = invoiceGenerator.calculateCabFare(distance,time);
         Assert.assertNotEquals(25,fare,0.0);
+    }
+
+    //Step-2
+    //TC-2.1
+    @Test
+    public void givenMultipleRides_whenInvoiceGenerator_shouldReturnCorrectTotalFare() {
+        Ride[]cabRides={new Ride(20.0,25),
+                new Ride(0.1,1)};
+        double fare= invoiceGenerator.calculateCabFare(cabRides);
+        Assert.assertEquals(230,fare,0.0);
     }
 }
