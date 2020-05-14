@@ -69,4 +69,16 @@ public class InvoiceGeneratorTest {
         InvoiceSummary expectedSummary=new InvoiceSummary(2,230);
         Assert.assertEquals(invoiceSummary, expectedSummary);
     }
+
+    //TC-3.2
+    @Test
+    public void givenMultipleRides_WhenImProper_ShouldReturnInCorrectInvoiceSummary() {
+        Ride[] cabRides = {
+                new Ride(20.0, 25),
+                new Ride(0.1, 1)
+        };
+        InvoiceSummary invoiceSummary = invoiceService.calculateFare(cabRides);
+        InvoiceSummary expectedSummary = new InvoiceSummary(2, 200);
+        Assert.assertNotEquals(invoiceSummary, expectedSummary);
+    }
 }
