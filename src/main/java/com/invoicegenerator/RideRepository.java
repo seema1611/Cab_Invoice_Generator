@@ -1,22 +1,27 @@
 package com.invoicegenerator;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-class RideRepoisitory {
-    Map<String, ArrayList<Ride>>Rides;
-    public RideRepoisitory() {
-        this.Rides=new HashMap<>();
+public class RideRepository {
+
+    Map<String, ArrayList<Ride>> userRides;
+
+    public RideRepository() {
+        this.userRides = new HashMap<>();
     }
 
     public void addRides(String userId, Ride[] rides) {
-        this.Rides.put(userId,new ArrayList<>(Arrays.asList(rides)));
+        ArrayList<Ride> rideList = this.userRides.get(userId);
+        if(rideList == null) {
+            this.userRides.put(userId, new ArrayList<Ride>(Arrays.asList(rides)));
+        } else {
+            Collections.addAll(rideList, rides);
+            this.userRides.put(userId, rideList);
+        }
+
     }
 
-    public Ride[]getRides(String userId) {
-        return this.Rides.get(userId).toArray(new Ride[0]);
+    public Ride[] getRides(String userId) {
+        return this.userRides.get(userId).toArray(new Ride[0]);
     }
-
 }

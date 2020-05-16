@@ -1,114 +1,114 @@
 package com.invoicegenerator.test;
 
-import com.invoicegenerator.InvoiceService;
-import com.invoicegenerator.InvoiceSummary;
-import com.invoicegenerator.Ride;
+import com.invoicegenerator.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 public class InvoiceGeneratorTest {
-    InvoiceService invoiceService=null;
+    InvoiceService invoiceService;
+    RideRepository rideRepository;
 
     @Before
-    public void setup() {
+    public void setUp() throws Exception {
         invoiceService = new InvoiceService();
+        rideRepository = new RideRepository();
+        invoiceService.setRideRepository(rideRepository);
     }
 
     //Step-1
-    //TC-1.1
+    //TC-1.1<----For Normal Ride---->
     @Test
-    public void givenDistanceAndTime_WhenProper_shouldReturnCorrectTotalFare() {
-        double distance=20.0;
-        int time=25;
-        double fare = invoiceService.calculateFare(distance,time);
-        Assert.assertEquals(225,fare,0.0);
+    public void givenDistanceAndTimeNormalRides_whenProper_ShouldReturnTotalFare() {
+        Ride[] rides = {
+                new Ride(20.0, 25, CabRideCategory.NORMAL)
+        };
+        InvoiceSummary expectedInvoiceSummary = new InvoiceSummary(1, 225);
+        InvoiceSummary invoiceSummary = invoiceService.calculateFare(rides);
+        Assert.assertEquals(expectedInvoiceSummary, invoiceSummary);
     }
 
-    //TC-1.2
+    //TC-1.2<----For Normal Ride---->
     @Test
-    public void givenDistanceAndTime_WhenImProper_shouldReturnIncorrectTotalFare() {
-        double distance=0.1;
-        int time=1;
-        double fare = invoiceService.calculateFare(distance,time);
-        Assert.assertNotEquals(25,fare,0.0);
+    public void givenLowDistanceAndTimeNormalRides_whenProper_ShouldReturnTotalFare() {
+        Ride[] rides = {
+                new Ride(0.1, 1, CabRideCategory.NORMAL),
+        };
+        InvoiceSummary expectedInvoiceSummary = new InvoiceSummary(1, 5);
+        InvoiceSummary invoiceSummary = invoiceService.calculateFare(rides);
+        Assert.assertEquals(expectedInvoiceSummary, invoiceSummary);
+    }
+
+    //TC-1.3<----For Premium Ride---->
+    @Test
+    public void givenDistanceAndTimePremiumRides_whenProper_ShouldReturnTotalFare() {
+        Ride[] rides = {
+                new Ride(20.0, 25, CabRideCategory.PREMIUM)
+        };
+        InvoiceSummary expectedInvoiceSummary = new InvoiceSummary(1, 350);
+        InvoiceSummary invoiceSummary = invoiceService.calculateFare(rides);
+        Assert.assertEquals(expectedInvoiceSummary, invoiceSummary);
+    }
+
+    //TC-1.4<----For Premium Ride---->
+    @Test
+    public void givenLowDistanceAndTimePremiumRides_whenProper_ShouldReturnTotalFare() {
+        Ride[] rides = {
+                new Ride(0.5, 1, CabRideCategory.PREMIUM)
+        };
+        InvoiceSummary expectedInvoiceSummary = new InvoiceSummary(1, 20);
+        InvoiceSummary invoiceSummary = invoiceService.calculateFare(rides);
+        Assert.assertEquals(expectedInvoiceSummary, invoiceSummary);
     }
 
     //Step-2
-    //TC-2.1
+    //TC-2.1<----For Normal Ride---->
     @Test
-    public void givenMultipleRides_WhenProper_shouldReturnCorrectTotalFare() {
-        Ride[]rides={
-                new Ride(20.0,25),
-                new Ride(0.1,1)
+    public void givenMultipleNormalRides_whenProper_ShouldReturnTotalFare() {
+        Ride[] rides = {
+                new Ride(20.0, 25, CabRideCategory.NORMAL),
+                new Ride(0.1, 1, CabRideCategory.NORMAL)
         };
-        double fare= invoiceService.calculateCabFare(rides);
-        Assert.assertEquals(230,fare,0.0);
+        InvoiceSummary summary = invoiceService.calculateFare(rides);
+        InvoiceSummary expectedInvoiceSummary = new InvoiceSummary(2, 230.0);
+        Assert.assertEquals(expectedInvoiceSummary, summary);
     }
 
-    //TC-2.2
+    //TC-2.2<----For Premium Ride---->
     @Test
-    public void givenMultipleRides_WhenImProper_shouldReturnInCorrectTotalFare() {
-        Ride[]rides={
-                new Ride(20.0,25),
-                new Ride(0.1,1)
+    public void givenMultiplePremiumRides_whenProper_ShouldReturnTotalFare() {
+        Ride[] rides = {new Ride(20.0, 25, CabRideCategory.PREMIUM),
+                new Ride(0.1, 1, CabRideCategory.PREMIUM)
         };
-        double fare = invoiceService.calculateCabFare(rides);
-        Assert.assertNotEquals(350,fare,0.0);
+        InvoiceSummary summary = invoiceService.calculateFare(rides);
+        InvoiceSummary expectedInvoiceSummary = new InvoiceSummary(2, 370.0);
+        Assert.assertEquals(expectedInvoiceSummary, summary);
     }
 
     //Step-3
-    //TC-3.1
+    //TC-3.1<----For Normal Ride---->
     @Test
-    public void givenMultipleRides_WhenProper_ShouldReturnCorrectInvoiceSummary() {
-        Ride[] rides={
-                new Ride(20.0,25),
-                new Ride(0.1,1)
+    public void givenUserIdAndMultipleNormalRides_whenProper_ShouldReturnInvoiceSummary() {
+        String userId = "seema@123";
+        Ride[] rides = {new Ride(20.0, 25, CabRideCategory.NORMAL),
+                        new Ride(0.1, 1, CabRideCategory.NORMAL)
         };
-        InvoiceSummary invoiceSummary = invoiceService.calculateFare(rides);
-        InvoiceSummary expectedSummary=new InvoiceSummary(2,230);
-        Assert.assertEquals(invoiceSummary, expectedSummary);
+        invoiceService.addRides(userId, rides);
+        InvoiceSummary invoiceSummary = invoiceService.getInvoiceSummary(userId);
+        InvoiceSummary expectedInvoiceSummary = new InvoiceSummary(2, 230.0);
+        Assert.assertEquals(expectedInvoiceSummary, invoiceSummary);
     }
 
-    //TC-3.2
+    //TC-3.2<----For Premium Ride---->
     @Test
-    public void givenMultipleRides_WhenImProper_ShouldReturnInCorrectInvoiceSummary() {
-        Ride[] cabRides = {
-                new Ride(20.0, 25),
-                new Ride(0.1, 1)
+    public void givenUserIdAndMultiplePremiumRides_whenProper_ShouldReturnInvoiceSummary() {
+        String userId = "seema@123";
+        Ride[] rides = {new Ride(20.0, 25, CabRideCategory.PREMIUM),
+                        new Ride(0.1, 1, CabRideCategory.PREMIUM)
         };
-        InvoiceSummary invoiceSummary = invoiceService.calculateFare(cabRides);
-        InvoiceSummary expectedSummary = new InvoiceSummary(2, 200);
-        Assert.assertNotEquals(invoiceSummary, expectedSummary);
-    }
-
-    //Step-4
-    //UC-4.1
-    @Test
-    public void givenUserIdAndRides_WhenProper_ShouldReturnInvoiceSummary()
-    {
-        String userId="seema@123";
-        Ride[]rides={
-                new Ride(20.0,25),
-                new Ride(0.1,1)
-        };
-        invoiceService.addRides(userId,rides);
-        InvoiceSummary Summary=invoiceService.getInvoiceSummary(userId);
-        InvoiceSummary expectedInvoiceSummary=new InvoiceSummary(2,230);
-        Assert.assertEquals(expectedInvoiceSummary,Summary);
-    }
-
-    //TC-4.2
-    @Test
-    public void givenUserIdAndRides_WhenImProper_ShouldReturnInvoiceSummary() {
-        String userId="seema@123";
-        Ride[]rides={
-                new Ride(20.0,25),
-                new Ride(0.1,1)
-        };
-        invoiceService.addRides(userId,rides);
-        InvoiceSummary Summary=invoiceService.getInvoiceSummary(userId);
-        InvoiceSummary expectedInvoiceSummary=new InvoiceSummary(2,30);
-        Assert.assertNotEquals(expectedInvoiceSummary,Summary);
+        invoiceService.addRides(userId, rides);
+        InvoiceSummary invoiceSummary = invoiceService.getInvoiceSummary(userId);
+        InvoiceSummary expectedInvoiceSummary = new InvoiceSummary(2, 370.0);
+        Assert.assertEquals(expectedInvoiceSummary, invoiceSummary);
     }
 }
